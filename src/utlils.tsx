@@ -1,10 +1,22 @@
 
 export const getSampleFile = () => {
     fetch(`http://localhost:8080/api/v1/getSampleFile`, {
-      method: "GET"
+      method: "GET",
+      headers: {
+        "Content-type": "application/octet-stream"
+      },
+     
      
     }).then((res) => {
         console.log(res.body);
+        res.blob().then((fileBlob) => { // convert the excel file to blob
+             fileBlob = new Blob([fileBlob], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                  });
+            let file = new File([fileBlob], "Sample.xlsx"); //convert the blob into file
+            console.log(file);
+            return file;
+        })
         // const blob = new Blob([res.blob as BlobPart], {
         //     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         //   });
