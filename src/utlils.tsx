@@ -17,17 +17,6 @@ export const getSampleFile = () => {
             console.log(file);
             return file;
         })
-        // const blob = new Blob([res.blob as BlobPart], {
-        //     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        //   });
-        //   console.log(blob);
-        // var file = new File([blob], "name");
-        // console.log(file);
-        // const element = document.createElement('a');
-        // element.href = URL.createObjectURL(file);
-        // element.setAttribute('download', ".xlsx");
-        // document.body.appendChild(element);
-        // element.click();
     });
 };
 

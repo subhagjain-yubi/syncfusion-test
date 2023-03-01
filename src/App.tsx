@@ -1,53 +1,61 @@
-import { SpreadsheetComponent ,Spreadsheet} from '@syncfusion/ej2-react-spreadsheet';
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { SpreadsheetComponent } from '@syncfusion/ej2-react-spreadsheet';
 import './App.css';
-import {  getSampleFile,getFormalatedValue} from './utlils';
 
-function App() {
-  const [spreadsheet,setSpreadsheet]=useState()
-  useEffect(()=>{
-    fetch("https://js.syncfusion.com/demos/ejservices/data/Spreadsheet/LargeData.xlsx") // fetch the remote url
-    .then((response) => {
-    response.blob().then((fileBlob) => {
-        var file = new File([fileBlob], "Sample.xlsx"); //convert the blob into file
-        // this.spreadsheet.open({ file: file }); // open the file into Spreadsheet
-        // setSpreadsheet({ file: file })
-    });
-});
-// }
-  },[])
-  console.log(getSampleFile());
-  // console.log(getFormalatedValue());
-//   let spreadsheet: Spreadsheet = new Spreadsheet({
-//     openUrl: 'https://ej2services.syncfusion.com/production/web-services/api/spreadsheet/open',
-//     saveUrl: 'https://ej2services.syncfusion.com/production/web-services/api/spreadsheet/save',
-//     created: (): void => {
-//         fetch("http://localhost:8080/api/v1/getSampleFile") // fetch the remote url
-//             .then((response) => {
-//               console.log(response);
-//                 response.blob().then((fileBlob) => { // convert the excel file to blob
-//                 let file = new File([fileBlob], "Sample.xlsx"); //convert the blob into file
-//                 spreadsheet.open({ file: file }); // open the file into Spreadsheet
-//                 })
-//             })
-//     }
-// });
-//Render the initialized Spreadsheet
-// spreadsheet.appendTo('#spreadsheet');
+const  App= ()=> {
+
+  const spreadsheet=React.useRef<any>()
+   const load=()=> {
+        fetch("http://localhost:8080/api/v1/getSampleFile") // fetch the remote url
+            .then((response) => {
+            response.blob().then((fileBlob) => {
+                var file = new File([fileBlob], "Sample.xlsx"); //convert the blob into file
+                spreadsheet.current.open({ file: file }); // open the file into Spreadsheet
+            });
+        });
+    }
 
 
-   
-  // return (<SpreadsheetComponent  ref={(ssObj) => { spreadsheet = ssObj; }} openUrl='https://ej2services.syncfusion.com/production/web-services/api/spreadsheet/open' created={created.bind()}>
-  //                   </SpreadsheetComponent>);
+    const beforeSave=(args:any)=>{
+        console.log(args)
+        console.log(Response)
+        args.needBlobData = true;
+        args.isFullPost = false;
+    }
+    async function functiond (args:any){
+        var formData = new FormData();
+        console.log(args)
+        formData.append("file", args.blobData, "Sample.xlsx");
+        console.log(args)
+        return formData;
+    }
+
+    const saveComplete = async (args: any) => {
+        console.log(args)
+        
+        var formData = await functiond (args);
+        console.log(args)
+        fetch("http://localhost:8080/api/v1/pushFile", {
+          method: "POST",
+          body: formData,
+        }).then((response) => {
+          console.log(response);
+        });
+      };
+    const fileMenuItemSelect=(args:any)=>{
+    }
+
     
-  
-  return (
-    <div className="App">
-      <div id="spreadsheet"></div>
-    <SpreadsheetComponent allowSave={true} allowOpen={true} openUrl='http://localhost:8080/api/v1/getSampleFile'/>
-   </div>
-   
-  );
-}
-
-export default App;
+        return (<SpreadsheetComponent
+        ref={spreadsheet}
+        allowSave={true}
+        openUrl='https://ej2services.syncfusion.com/production/web-services/api/spreadsheet/open'
+        saveUrl='https://ej2services.syncfusion.com/production/web-services/api/spreadsheet/save'
+        // fileMenuItemSelect={fileMenuItemSelect}
+        created={load}
+        beforeSave= {beforeSave}
+        saveComplete= { saveComplete}
+        >
+                    </SpreadsheetComponent>);
+    }
+export default App
